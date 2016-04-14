@@ -1,0 +1,238 @@
+﻿{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+  "parameters": {
+    "vmSize": {
+      "type": "string",
+      "defaultValue": "Basic_A2",
+      "allowedValues": [
+        "Basic_A1",
+        "Basic_A2"
+      ]
+    },
+    "location": {
+      "type": "string",
+      "defaultValue": "West Europe",
+      "allowedValues": [
+        "West Europe",
+        "North Europe",
+        "East US"
+      ]
+    },
+    "adminUsername": {
+      "type": "string",
+      "defaultValue": "azmin"
+    },
+    "adminPassword": {
+      "type": "securestring"
+    },
+    "configurationUrl": {
+      "type": "string",
+      "defaultValue": "https://raw.githubusercontent.com/llstrk/OpenTTD-AzureARM/master/OpenTTD/OpenTTD/Scripts/OpenTTDDSC.ps1.zip"
+    },
+    "configurationScript": {
+      "type": "string",
+      "defaultValue": "OpenTTDDSC.ps1"
+    },
+    "configurationFunction": {
+      "type": "string",
+      "defaultValue": "OpenTTDServer"
+    },
+    "vmSku": {
+      "type": "string",
+      "allowedValues": [
+        "2012-R2-Datacenter",
+        "2016-Nano-Server-Technical-Preview"
+      ],
+      "defaultValue": "2016-Nano-Server-Technical-Preview"
+    }
+  },
+  "variables": {
+    "apiVersion": {
+      "compute": {
+        "virtualMachines": "2015-06-15",
+        "extensions": "2015-06-15"
+      },
+      "network": {
+        "networkInterfaces": "2015-06-15",
+        "virtualNetworks": "2015-06-15",
+        "publicIPAddresses": "2015-06-15"
+      },
+      "storage": {
+        "storageAccounts": "2015-06-15"
+      }
+    },
+    "server": {
+      "name": "server1"
+    },
+    "network": {
+      "server": {
+        "private": "server1nic1",
+        "public": "server1nic2"
+      },
+      "subnet": {
+        "name": "cdsubnet",
+        "prefix": "192.168.0.0/24"
+      },
+      "virtualNetwork": {
+        "name": "cdvnet",
+        "prefix": "192.168.0.0/16"
+      }
+    },
+    "storageAccountName": "[uniqueString(resourceGroup().id)]",
+    "virtualNetworkName": "cdvnet",
+    "virtualNetworkId": "[resourceId('Microsoft.Network/virtualNetworks', variables('virtualNetworkName'))]",
+    "subnetName": "cdsubnet",
+    "subnetReference": "[concat(variables('virtualNetworkId'), '/subnets/', variables('subnetName'))]",
+    "storage": {
+      "server": {
+        "name": "osdisk",
+        "vhd": {
+          "uri": "[concat('http://', variables('storageAccountName'), '.blob.core.windows.net/', 'vhds', '/', 'osdisk.vhd')]"
+        }
+      },
+      "account": {
+        "name": "[uniqueString(resourceGroup().id)]",
+        "type": "Standard_LRS"
+      }
+    }
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Storage/storageAccounts",
+      "apiVersion": "[variables('apiVersion').storage.storageAccounts]",
+      "location": "[parameters('location')]",
+      "name": "[variables('storage').account.name]",
+      "properties": {
+        "accountType": "[variables('storage').account.type]"
+      }
+    },
+    {
+      "type": "Microsoft.Network/virtualNetworks",
+      "apiVersion": "[variables('apiVersion').network.virtualNetworks]",
+      "location": "[parameters('location')]",
+      "name": "[variables('network').virtualNetwork.name]",
+      "properties": {
+        "subnets": [
+          {
+            "name": "[variables('network').subnet.name]",
+            "properties": {
+              "addressPrefix": "[variables('network').subnet.prefix]"
+            }
+          }
+        ],
+        "addressSpace": {
+          "addressPrefixes": [
+            "[variables('network').virtualNetwork.prefix]"
+          ]
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Compute/virtualMachines",
+      "apiVersion": "[variables('apiVersion').compute.virtualMachines]",
+      "name": "[variables('server').name]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[concat('Microsoft.Storage/storageAccounts/', variables('storageAccountName'))]",
+        "[concat('Microsoft.Network/networkInterfaces/', variables('network').server.private)]"
+      ],
+      "properties": {
+        "hardwareProfile": {
+          "vmSize": "[parameters('vmSize')]"
+        },
+        "networkProfile": {
+          "networkInterfaces": [
+            {
+              "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('network').server.private)]"
+            }
+          ]
+        },
+        "storageProfile": {
+          "osDisk": {
+            "name": "[variables('storage').server.name]",
+            "createOption": "FromImage",
+            "caching": "readwrite",
+            "vhd": {
+              "uri": "[variables('storage').server.vhd.uri]"
+            }
+          },
+          "imageReference": {
+            "offer": "WindowsServer",
+            "publisher": "MicrosoftWindowsServer",
+            "version": "latest",
+            "sku": "[parameters('vmSku')]"
+          }
+        },
+        "osProfile": {
+          "computerName": "[variables('server').name]",
+          "adminUsername": "[parameters('adminUsername')]",
+          "adminPassword": "[parameters('adminPassword')]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Network/networkInterfaces",
+      "apiVersion": "[variables('apiVersion').network.networkInterfaces]",
+      "location": "[parameters('location')]",
+      "name": "[variables('network').server.private]",
+      "dependsOn": [
+        "[concat('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]",
+        "[concat('Microsoft.Network/publicIPAddresses/', variables('network').server.public)]"
+      ],
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "ipconfig",
+            "properties": {
+              "privateIPAllocationMethod": "Dynamic",
+              "publicIPAddress": {
+                "id": "[resourceId('Microsoft.Network/publicIPAddresses/', variables('network').server.public)]"
+              },
+              "subnet": {
+                "id": "[variables('subnetReference')]"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "Microsoft.Compute/virtualMachines/extensions",
+      "apiVersion": "[variables('apiVersion').compute.extensions]",
+      "name": "[concat(variables('server').name, '/Microsoft.PowerShell.DSC')]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[concat('Microsoft.Compute/virtualMachines/', variables('server').name)]"
+      ],
+      "properties": {
+        "publisher": "Microsoft.PowerShell",
+        "type": "DSC",
+        "typeHandlerVersion": "2.14",
+        "autoUpgradeMinorVersion": "true",
+        "settings": {
+          "wmfVersion": "latest",
+          "configuration": {
+            "url": "[parameters('configurationUrl')]",
+            "script": "[parameters('configurationScript')]",
+            "function": "[parameters('configurationFunction')]"
+          },
+          "configurationArguments": {
+            "ComputerName": "[variables('server').name]"
+          }
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Network/publicIPAddresses",
+      "apiVersion": "[variables('apiVersion').network.publicIPAddresses]",
+      "location": "[parameters('location')]",
+      "name": "[variables('network').server.public]",
+      "properties": {
+        "publicIPAllocationMethod": "Dynamic"
+      }
+    }
+  ],
+    "outputs": {
+    }
+}
