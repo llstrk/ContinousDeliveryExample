@@ -12,8 +12,9 @@
     },
     "location": {
       "type": "string",
-      "defaultValue": "North Europe",
+      "defaultValue": "West Europe",
       "allowedValues": [
+        "West Europe",
         "North Europe",
         "East US"
       ]

@@ -6,7 +6,7 @@ configuration Default {
 	Import-DscResource -ModuleName 'PSDesiredStateConfiguration'
 
 	WindowsFeature TelnetClient {
-		Name = "Telnet-Client"
-		Ensure = "Present"
+		Name   = "Telnet-Client"
+		Ensure = "Absent"
 	}
 }
