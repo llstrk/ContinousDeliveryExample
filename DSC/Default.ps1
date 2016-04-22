@@ -7,6 +7,6 @@ configuration Default {
 
 	WindowsFeature TelnetClient {
 		Name   = "Telnet-Client"
-		Ensure = "Present"
+		Ensure = "Absent"
 	}
 }
