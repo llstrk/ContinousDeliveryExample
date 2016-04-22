@@ -219,7 +219,7 @@
         "typeHandlerVersion": "2.14",
         "autoUpgradeMinorVersion": "true",
         "settings": {
-          "wmfVersion": "5.0",
+          "wmfVersion": "latest",
           "configuration": {
             "url": "[parameters('configurationUrl')]",
             "script": "[parameters('configurationScript')]",
