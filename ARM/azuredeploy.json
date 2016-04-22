@@ -44,7 +44,7 @@
         "2016-Nano-Server-Technical-Preview",
         "Windows-Server-Technical-Preview"
       ],
-      "defaultValue": "2012-R2-Datacenter"
+      "defaultValue": "Windows-Server-Technical-Preview"
     }
   },
   "variables": {
