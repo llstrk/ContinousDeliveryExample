@@ -44,7 +44,7 @@
         "2016-Nano-Server-Technical-Preview",
         "Windows-Server-Technical-Preview"
       ],
-      "defaultValue": "Windows-Server-Technical-Preview"
+      "defaultValue": "2012-R2-Datacenter"
     }
   },
   "variables": {
@@ -220,7 +220,7 @@
         "typeHandlerVersion": "2.14",
         "autoUpgradeMinorVersion": "true",
         "settings": {
-          "wmfVersion": "latest",
+          "wmfVersion": "4.0",
           "configuration": {
             "url": "[parameters('configurationUrl')]",
             "script": "[parameters('configurationScript')]",
