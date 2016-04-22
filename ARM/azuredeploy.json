@@ -1,6 +1,6 @@
 ﻿{
-    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
-    "contentVersion": "1.0.0.0",
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
   "parameters": {
     "vmSize": {
       "type": "string",
@@ -12,9 +12,8 @@
     },
     "location": {
       "type": "string",
-      "defaultValue": "West Europe",
+      "defaultValue": "North Europe",
       "allowedValues": [
-        "West Europe",
         "North Europe",
         "East US"
       ]
@@ -27,16 +26,15 @@
       "type": "securestring"
     },
     "configurationUrl": {
-      "type": "string",
-      "defaultValue": "https://raw.githubusercontent.com/llstrk/OpenTTD-AzureARM/master/OpenTTD/OpenTTD/Scripts/OpenTTDDSC.ps1.zip"
+      "type": "string"
     },
     "configurationScript": {
       "type": "string",
-      "defaultValue": "OpenTTDDSC.ps1"
+      "defaultValue": "Default.ps1"
     },
     "configurationFunction": {
       "type": "string",
-      "defaultValue": "OpenTTDServer"
+      "defaultValue": "Default"
     },
     "vmSku": {
       "type": "string",
@@ -44,7 +42,7 @@
         "2012-R2-Datacenter",
         "2016-Nano-Server-Technical-Preview"
       ],
-      "defaultValue": "2016-Nano-Server-Technical-Preview"
+      "defaultValue": "2012-R2-Datacenter"
     }
   },
   "variables": {
@@ -198,6 +196,15 @@
       }
     },
     {
+      "type": "Microsoft.Network/publicIPAddresses",
+      "apiVersion": "[variables('apiVersion').network.publicIPAddresses]",
+      "location": "[parameters('location')]",
+      "name": "[variables('network').server.public]",
+      "properties": {
+        "publicIPAllocationMethod": "Dynamic"
+      }
+    },
+    {
       "type": "Microsoft.Compute/virtualMachines/extensions",
       "apiVersion": "[variables('apiVersion').compute.extensions]",
       "name": "[concat(variables('server').name, '/Microsoft.PowerShell.DSC')]",
@@ -211,7 +218,7 @@
         "typeHandlerVersion": "2.14",
         "autoUpgradeMinorVersion": "true",
         "settings": {
-          "wmfVersion": "latest",
+          "wmfVersion": "4.0",
           "configuration": {
             "url": "[parameters('configurationUrl')]",
             "script": "[parameters('configurationScript')]",
@@ -222,17 +229,8 @@
           }
         }
       }
-    },
-    {
-      "type": "Microsoft.Network/publicIPAddresses",
-      "apiVersion": "[variables('apiVersion').network.publicIPAddresses]",
-      "location": "[parameters('location')]",
-      "name": "[variables('network').server.public]",
-      "properties": {
-        "publicIPAllocationMethod": "Dynamic"
-      }
     }
   ],
-    "outputs": {
-    }
+  "outputs": {
+  }
 }
