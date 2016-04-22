@@ -4,10 +4,12 @@
   "parameters": {
     "vmSize": {
       "type": "string",
-      "defaultValue": "Basic_A2",
+      "defaultValue": "Standard_DS2",
       "allowedValues": [
         "Basic_A1",
-        "Basic_A2"
+        "Basic_A2",
+        "Standard_DS1",
+        "Standard_DS2"
       ]
     },
     "location": {
