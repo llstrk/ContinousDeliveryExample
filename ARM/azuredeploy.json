@@ -93,7 +93,7 @@
       },
       "account": {
         "name": "[uniqueString(resourceGroup().id)]",
-        "type": "Standard_LRS"
+        "type": "Premium_LRS"
       }
     }
   },
