@@ -227,9 +227,6 @@
             "url": "[parameters('configurationUrl')]",
             "script": "[parameters('configurationScript')]",
             "function": "[parameters('configurationFunction')]"
-          },
-          "configurationArguments": {
-            "ComputerName": "[variables('server').name]"
           }
         }
       }
