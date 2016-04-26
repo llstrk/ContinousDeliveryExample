@@ -1,4 +1,4 @@
-configuration Config {
+configuration Default {
     Import-DscResource -ModuleName PSDesiredStateConfiguration
 
     Node "WebServer" {
