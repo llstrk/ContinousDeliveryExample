@@ -1,14 +1,14 @@
-configuration Config {
+configuration Default {
     Import-DscResource -ModuleName PSDesiredStateConfiguration
 
     Node "WebServer" {
         WindowsFeature TelnetClient {
             Name   = "Telnet-Client"
-            Ensure = "Absent"
+            Ensure = "Present"
         }
         WindowsFeature WebServer {
             Name   = "Web-Server"
-            Ensure = "Absent"
+            Ensure = "Present"
         }
     }
 }
