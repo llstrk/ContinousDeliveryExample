@@ -6,5 +6,9 @@ configuration Default {
 		    Name   = "Telnet-Client"
 		    Ensure = "Present"
 	    }
+        WindowsFeature IIS {
+            Name   = "Web-Server"
+            Ensure = "Present"
+        }
     }
 }
