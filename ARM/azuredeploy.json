@@ -4,12 +4,13 @@
   "parameters": {
     "vmSize": {
       "type": "string",
-      "defaultValue": "Standard_DS2",
+      "defaultValue": "Standard_DS3_V2",
       "allowedValues": [
         "Basic_A1",
         "Basic_A2",
-        "Standard_DS1",
-        "Standard_DS2"
+        "Standard_DS1_V1",
+        "Standard_DS2_V2",
+        "Standard_DS3_V2"
       ]
     },
     "location": {
@@ -155,6 +156,7 @@
             "name": "[variables('storage').server.name]",
             "createOption": "FromImage",
             "caching": "readwrite",
+            "diskSizeGB": 512,
             "vhd": {
               "uri": "[variables('storage').server.vhd.uri]"
             }
