@@ -4,11 +4,11 @@ configuration Default {
     Node "WebServer" {
         WindowsFeature TelnetClient {
             Name   = "Telnet-Client"
-            Ensure = "Present"
+            Ensure = "Absent"
         }
         WindowsFeature WebServer {
             Name   = "Web-Server"
-            Ensure = "Present"
+            Ensure = "Absent"
         }
     }
 }
