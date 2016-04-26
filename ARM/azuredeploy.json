@@ -4,16 +4,20 @@
   "parameters": {
     "vmSize": {
       "type": "string",
-      "defaultValue": "Basic_A2",
+      "defaultValue": "Standard_DS3_V2",
       "allowedValues": [
         "Basic_A1",
-        "Basic_A2"
+        "Basic_A2",
+        "Standard_DS1_V1",
+        "Standard_DS2_V2",
+        "Standard_DS3_V2"
       ]
     },
     "location": {
       "type": "string",
-      "defaultValue": "North Europe",
+      "defaultValue": "West Europe",
       "allowedValues": [
+        "West Europe",
         "North Europe",
         "East US"
       ]
@@ -40,7 +44,8 @@
       "type": "string",
       "allowedValues": [
         "2012-R2-Datacenter",
-        "2016-Nano-Server-Technical-Preview"
+        "2016-Nano-Server-Technical-Preview",
+        "Windows-Server-Technical-Preview"
       ],
       "defaultValue": "2012-R2-Datacenter"
     }
@@ -91,7 +96,7 @@
       },
       "account": {
         "name": "[uniqueString(resourceGroup().id)]",
-        "type": "Standard_LRS"
+        "type": "Premium_LRS"
       }
     }
   },
@@ -151,6 +156,7 @@
             "name": "[variables('storage').server.name]",
             "createOption": "FromImage",
             "caching": "readwrite",
+            "diskSizeGB": 512,
             "vhd": {
               "uri": "[variables('storage').server.vhd.uri]"
             }
@@ -218,14 +224,11 @@
         "typeHandlerVersion": "2.14",
         "autoUpgradeMinorVersion": "true",
         "settings": {
-          "wmfVersion": "4.0",
+          "wmfVersion": "latest",
           "configuration": {
             "url": "[parameters('configurationUrl')]",
             "script": "[parameters('configurationScript')]",
             "function": "[parameters('configurationFunction')]"
-          },
-          "configurationArguments": {
-            "ComputerName": "[variables('server').name]"
           }
         }
       }
