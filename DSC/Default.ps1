@@ -1,4 +1,5 @@
-﻿configuration Default {
+﻿
+configuration Default {
     Import-DscResource -ModuleName 'PSDesiredStateConfiguration'
 
     Script ConfigureWinRM {
