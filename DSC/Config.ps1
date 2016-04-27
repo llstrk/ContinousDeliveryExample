@@ -18,7 +18,12 @@ configuration Default {
                     return $false
                 }
                 else {
-                    $content -like '*DSC Agent ID*'
+                    if ($content -like '*DSC Agent ID*') {
+                        return $true
+                    }
+                    else {
+                        return $false
+                    }
                 }
             }
             SetScript = {
