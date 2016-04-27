@@ -10,5 +10,15 @@ configuration Default {
             Name   = "Web-Server"
             Ensure = "Present"
         }
+        Script WebSite {
+            GetScript = {@{}}
+            TestScript = {$false}
+            SetScript = {
+                $path    = "C:\inetpub\wwwroot\iisstart.htm"
+                $content = "<html><p>DSC Agent ID: $((Get-DscLocalConfigurationManager).AgentID)</p><p>OS Version: $((Get-CimInstance -ClassName Win32_OperatingSystem).Version)</p></html>"
+                $content | Out-File -FilePath $path -Force
+            }
+            DependsOn = "[WindowsFeature]WebServer"
+        }
     }
 }
