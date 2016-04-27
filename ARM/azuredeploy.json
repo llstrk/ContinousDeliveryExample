@@ -47,7 +47,7 @@
         "2016-Nano-Server-Technical-Preview",
         "Windows-Server-Technical-Preview"
       ],
-      "defaultValue": "Windows-Server-Technical-Preview"
+      "defaultValue": "2016-Nano-Server-Technical-Preview"
     }
   },
   "variables": {
