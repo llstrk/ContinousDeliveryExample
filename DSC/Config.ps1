@@ -13,7 +13,7 @@ configuration Default {
         Script WebSite {
             GetScript = {@{}}
             TestScript = {
-                $content = Get-Content -Path C:\inetpub\wwwroot\iisstart.htm2 -ErrorAction SilentlyContinue
+                $content = Get-Content -Path C:\inetpub\wwwroot\iisstart.htm -ErrorAction SilentlyContinue
                 if ($content -eq $null) {
                     return $false
                 }
