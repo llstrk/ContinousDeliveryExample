@@ -8,7 +8,7 @@ configuration Default {
         }
         WindowsFeature WebServer {
             Name   = "Web-Server"
-            Ensure = "Absent"
+            Ensure = "Present"
         }
     }
 }
