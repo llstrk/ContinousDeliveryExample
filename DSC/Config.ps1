@@ -15,7 +15,7 @@ configuration Default {
             TestScript = {
                 $content = Get-Content -Path C:\inetpub\wwwroot\iisstart.htm2 -ErrorAction SilentlyContinue
                 if ($content -eq $null) {
-                    return false
+                    return $false
                 }
                 else {
                     $content -like '*DSC Agent ID*'
