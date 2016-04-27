@@ -12,7 +12,15 @@ configuration Default {
         }
         Script WebSite {
             GetScript = {@{}}
-            TestScript = {$false}
+            TestScript = {
+                $content = Get-Content -Path C:\inetpub\wwwroot\iisstart.htm2 -ErrorAction SilentlyContinue
+                if ($content -eq $null) {
+                    return $false
+                }
+                else {
+                    $content -like '*DSC Agent ID*'
+                }
+            }
             SetScript = {
                 $path    = "C:\inetpub\wwwroot\iisstart.htm"
                 $content = "<html><p>DSC Agent ID: $((Get-DscLocalConfigurationManager).AgentID)</p><p>OS Version: $((Get-CimInstance -ClassName Win32_OperatingSystem).Version)</p></html>"
