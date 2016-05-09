@@ -4,7 +4,7 @@
   "parameters": {
     "vmSize": {
       "type": "string",
-      "defaultValue": "Standard_DS3_V2",
+      "defaultValue": "Basic_A2",
       "allowedValues": [
         "Basic_A1",
         "Basic_A2",
@@ -66,12 +66,12 @@
       }
     },
     "server": {
-      "name": "server1"
+      "name": "server"
     },
     "network": {
       "server": {
-        "private": "server1nic1",
-        "public": "server1nic2"
+        "private": "serverpriv",
+        "public": "serverpub"
       },
       "subnet": {
         "name": "cdsubnet",
@@ -91,12 +91,12 @@
       "server": {
         "name": "osdisk",
         "vhd": {
-          "uri": "[concat('http://', variables('storageAccountName'), '.blob.core.windows.net/', 'vhds', '/', 'osdisk.vhd')]"
+          "uri": "[concat('http://', variables('storageAccountName'), '.blob.core.windows.net/', 'vhds', '/')]"
         }
       },
       "account": {
         "name": "[uniqueString(resourceGroup().id)]",
-        "type": "Premium_LRS"
+        "type": "Standard_LRS"
       }
     }
   },
@@ -134,11 +134,15 @@
     {
       "type": "Microsoft.Compute/virtualMachines",
       "apiVersion": "[variables('apiVersion').compute.virtualMachines]",
-      "name": "[variables('server').name]",
+      "name": "[concat(variables('server').name, copyIndex())]",
       "location": "[parameters('location')]",
+      "copy": {
+        "name": "vmcopy",
+        "count": 5
+      },
       "dependsOn": [
         "[concat('Microsoft.Storage/storageAccounts/', variables('storageAccountName'))]",
-        "[concat('Microsoft.Network/networkInterfaces/', variables('network').server.private)]"
+        "[concat('Microsoft.Network/networkInterfaces/', variables('network').server.private, copyIndex())]"
       ],
       "properties": {
         "hardwareProfile": {
@@ -147,18 +151,18 @@
         "networkProfile": {
           "networkInterfaces": [
             {
-              "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('network').server.private)]"
+              "id": "[resourceId('Microsoft.Network/networkInterfaces', concat(variables('network').server.private, copyIndex()))]"
             }
           ]
         },
         "storageProfile": {
           "osDisk": {
-            "name": "[variables('storage').server.name]",
+            "name": "[concat(variables('storage').server.name, copyIndex())]",
             "createOption": "FromImage",
             "caching": "readwrite",
             "diskSizeGB": 512,
             "vhd": {
-              "uri": "[variables('storage').server.vhd.uri]"
+              "uri": "[concat(variables('storage').server.vhd.uri, 'osdisk', copyIndex(), '.vhd')]"
             }
           },
           "imageReference": {
@@ -169,7 +173,7 @@
           }
         },
         "osProfile": {
-          "computerName": "[variables('server').name]",
+          "computerName": "[concat(variables('server').name, copyIndex())]",
           "adminUsername": "[parameters('adminUsername')]",
           "adminPassword": "[parameters('adminPassword')]"
         }
@@ -180,9 +184,13 @@
       "apiVersion": "[variables('apiVersion').network.networkInterfaces]",
       "location": "[parameters('location')]",
       "name": "[variables('network').server.private]",
+      "copy": {
+        "name": "niccopy",
+        "count":  5
+      },
       "dependsOn": [
         "[concat('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]",
-        "[concat('Microsoft.Network/publicIPAddresses/', variables('network').server.public)]"
+        "[concat('Microsoft.Network/publicIPAddresses/', variables('network').server.public, copyIndex())]"
       ],
       "properties": {
         "ipConfigurations": [
@@ -191,7 +199,7 @@
             "properties": {
               "privateIPAllocationMethod": "Dynamic",
               "publicIPAddress": {
-                "id": "[resourceId('Microsoft.Network/publicIPAddresses/', variables('network').server.public)]"
+                "id": "[resourceId('Microsoft.Network/publicIPAddresses/', concat(variables('network').server.public, copyIndex()))]"
               },
               "subnet": {
                 "id": "[variables('subnetReference')]"
@@ -205,9 +213,13 @@
       "type": "Microsoft.Network/publicIPAddresses",
       "apiVersion": "[variables('apiVersion').network.publicIPAddresses]",
       "location": "[parameters('location')]",
-      "name": "[variables('network').server.public]",
+      "name": "[concat(variables('network').server.public, copyIndex())]",
       "properties": {
         "publicIPAllocationMethod": "Dynamic"
+      },
+      "copy": {
+        "name": "publicipcopy",
+        "count": 3
       }
     },
     {
@@ -215,8 +227,13 @@
       "apiVersion": "[variables('apiVersion').compute.extensions]",
       "name": "[concat(variables('server').name, '/Microsoft.PowerShell.DSC')]",
       "location": "[parameters('location')]",
+      "copy": {
+        "name": "dsccopy",
+        "count": 5
+      },
+
       "dependsOn": [
-        "[concat('Microsoft.Compute/virtualMachines/', variables('server').name)]"
+        "[concat('Microsoft.Compute/virtualMachines/', variables('server').name, copyIndex())]"
       ],
       "properties": {
         "publisher": "Microsoft.PowerShell",
