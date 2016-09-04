@@ -28,7 +28,7 @@ configuration Default {
             }
             SetScript = {
                 $path    = "C:\inetpub\wwwroot\iisstart.htm"
-                $content = "<html><p>DSC Agent ID: $((Get-DscLocalConfigurationManager).AgentID)</p><p>OS Version: $((Get-CimInstance -ClassName Win32_OperatingSystem).Version)</p></html>"
+                $content = "<html><p>DSC Agent ID: $((Get-DscLocalConfigurationManager).AgentID)</p><p>OS Version: $((Get-CimInstance -ClassName Win32_OperatingSystem).Version)</p><p>My fancy new webserver!</p></html>"
                 $content | Out-File -FilePath $path -Force
             }
             DependsOn = "[WindowsFeature]WebServer"
